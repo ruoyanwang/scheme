@@ -294,6 +294,10 @@ def do_lambda_form(vals, env, function_type=LambdaProcedure):
     formals = vals[0]
     check_formals(formals)
     "*** YOUR CODE HERE ***"
+    body = vals[1]
+    if len(vals) > 2:
+        body = Pair('begin', vals.second)
+    return (function_type(formals, body, env), env)
 
 def do_mu_form(vals, env):
     """Evaluate a mu (dynamically scoped lambda) form with formals VALS[0]
@@ -316,12 +320,12 @@ def do_define_form(vals, env):
         env.define(target, value)
     elif scheme_pairp(target):
         "*** YOUR CODE HERE ***"
-        #first = val[0].first
-        #if scheme_symbolp(first):
-        #    pair = Pair(vals[0].second, vals.second)
-        #    env.define(first, value)
-        #else:
-        #    raise SchemeError("Function name not a variable. Cannot assign")
+        first = vals[0].first
+        if scheme_symbolp(first):
+            pair = Pair(vals[0].second, vals.second)
+            env.define(first, value)
+        else:
+            raise SchemeError("Function name not a variable. Cannot assign")
     else:
         raise SchemeError("bad argument to define")
     return (target, env) # not sure about its position
@@ -403,6 +407,9 @@ def do_begin_form(vals, env):
     if scheme_nullp(vals):
         return okay, None
     "*** YOUR CODE HERE ***"
+    for i in range(0, len(vals)-1):
+        scheme_eval(vals[i], env)
+    return (vals[len(vals)-1], env)
 
 # Collected symbols with significance to the interpreter
 
