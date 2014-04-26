@@ -318,6 +318,7 @@ def do_define_form(vals, env):
     """Evaluate a define form with parameters VALS in environment ENV."""
     check_form(vals, 2)
     target = vals[0]
+
     if scheme_symbolp(target):
         check_form(vals, 2, 2)
         "*** YOUR CODE HERE ***"
