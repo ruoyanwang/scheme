@@ -56,7 +56,6 @@ def scheme_eval(expr, env):
                 else:
                     # UPDATED 4/14/2014 @ 19:08
                     expr, env = scheme_apply(procedure, args, env), None
-
     return expr
 
 proper_tail_recursion = False
@@ -374,10 +373,25 @@ def do_if_form(vals, env):
     """Evaluate if form with parameters VALS in environment ENV."""
     check_form(vals, 2, 3)
     "*** YOUR CODE HERE ***"
+    res = scheme_eval(vals[0], env)
+    if res == scheme_false:
+        try:
+            return vals[2], env
+        except IndexError:
+            return okay, env
+    else:
+        return vals[1], env
 
 def do_and_form(vals, env):
     """Evaluate short-circuited and with parameters VALS in environment ENV."""
     "*** YOUR CODE HERE ***"
+    if len(vals) == 0:
+        return scheme_true, env
+    for val in vals:
+        res = scheme_eval(val, env)
+        if res == scheme_false:
+            return scheme_false, None
+    return val, None # probably a hidden bug here
 
 def quote(value):
     """Return a Scheme expression quoting the Scheme VALUE.
@@ -393,6 +407,13 @@ def quote(value):
 def do_or_form(vals, env):
     """Evaluate short-circuited or with parameters VALS in environment ENV."""
     "*** YOUR CODE HERE ***"
+    if len(vals) == 0:
+        return scheme_false, None
+    for val in vals:
+        eval_res = scheme_eval(val, env)
+        if eval_res != scheme_false:
+            return eval_res, None
+    return scheme_false, None
 
 def do_cond_form(vals, env):
     """Evaluate cond form with parameters VALS in environment ENV."""
