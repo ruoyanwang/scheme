@@ -265,6 +265,8 @@ class MuProcedure(LambdaProcedure):
             "*** YOUR CODE HERE ***"
         else:
             "*** YOUR CODE HERE ***"
+            frame = env.make_call_frame(self.formals, args)
+            return scheme_eval(self.body, frame), None
 
 # Call-by-name (nu) extension.
 class NuProcedure(LambdaProcedure):
@@ -356,6 +358,12 @@ def do_let_form(vals, env):
     # Add a frame containing bindings
     names, values = nil, nil
     "*** YOUR CODE HERE ***"
+    for var in bindings:
+        if len(var) > 2:
+            raise SchemeError("bad bindings list in let form")
+        values = Pair(scheme_eval(var[1], env), values)
+        names = Pair(var.first, names)
+
     new_env = env.make_call_frame(names, values)
 
     # Evaluate all but the last expression after bindings, and return the last
@@ -430,6 +438,12 @@ def do_cond_form(vals, env):
             test = scheme_eval(clause.first, env)
         if test:
             "*** YOUR CODE HERE ***"
+            if test == scheme_true:
+                if clause.second == nil:
+                    return test, None
+            if len(clause.second) > 1:
+                return do_begin_form(clause.second, env)
+            return clause.second.first, None
     return okay, None
 
 def do_begin_form(vals, env):
