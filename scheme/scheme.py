@@ -12,7 +12,7 @@ from ucb import main, trace
 
 def scheme_eval(expr, env):
     """Evaluate Scheme expression EXPR in environment ENV. If ENV is None,
-    simply returns EXPR as its value without further evaluation.
+    simply returns EXPR as its value witho proceduut further evaluation.
     >>> expr = read_line("(+ 2 2)")
     >>> expr
     Pair('+', Pair(2, Pair(2, nil)))
@@ -246,11 +246,11 @@ class LambdaProcedure(Procedure):
 
 class MuProcedure(LambdaProcedure):
     """A procedure defined by a mu expression, which has dynamic scope.
-     _________________
-    < Scheme is cool! >
-     -----------------
+     ______________________
+    < Scheme is bull shit! >
+     ----------------------
             \   ^__^
-             \  (oo)\_______
+             \  (OO)\_______
                 (__)\       )\/\
                     ||----w |
                     ||     ||
@@ -395,12 +395,15 @@ def do_and_form(vals, env):
     "*** YOUR CODE HERE ***"
     if len(vals) == 0:
         return scheme_true, env
-    for val in vals:
-        res = scheme_eval(val, env)
-        if res == scheme_false:
+    elif len(vals) == 1:
+        return vals.first, env
+    else:
+        expr = vals.first
+        if scheme_eval(expr, env) == scheme_false:
             return scheme_false, None
-    return val, None # probably a hidden bug here
-
+        else:
+            return do_and_form(vals.second, env)
+    
 def quote(value):
     """Return a Scheme expression quoting the Scheme VALUE.
 
@@ -438,13 +441,14 @@ def do_cond_form(vals, env):
             test = scheme_eval(clause.first, env)
         if test:
             "*** YOUR CODE HERE ***"
-            if test == scheme_true:
-                if clause.second == nil:
-                    return test, None
-            if len(clause.second) > 1:
-                return do_begin_form(clause.second, env)
-            return clause.second.first, None
-    return okay, None
+            if len(clause.second) == 0:
+                return test, None
+            elif len(clause.second) == 1:
+                return scheme_eval(clause.second.first, env), None
+            else:
+                last = do_begin_form(clause.second, env)
+                return last
+    return okay, None 
 
 def do_begin_form(vals, env):
     """Evaluate begin form with parameters VALS in environment ENV."""
@@ -454,7 +458,7 @@ def do_begin_form(vals, env):
     "*** YOUR CODE HERE ***"
     for i in range(0, len(vals)-1):
         scheme_eval(vals[i], env)
-    return (vals[len(vals)-1], env)
+    return (scheme_eval(vals[len(vals)-1], env), None)
 
 # Collected symbols with significance to the interpreter
 
